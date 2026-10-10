@@ -1,0 +1,250 @@
+/*
+
+#include <Application.hpp>
+#include <MainWindow.hpp>
+
+int main(int argc, char** argv)
+{
+    HbTK::Application app(argc, argv);
+
+    HbTK::Window window(100, 100, 800, 600);
+
+    window.setTitle("HbTK Gallery");
+
+    app.addWindow(&window);
+
+    return app.exec();
+}
+
+*/
+
+/*
+ * HbTK Demo — Line by Line
+ *
+ * --------------------------------------------------------------------------
+ *
+ * #include <Application.hpp>
+ *
+ * Includes the HbTK Application class.
+ *
+ * Application is responsible for:
+ *
+ *     - opening the X11 display connection
+ *     - owning the main event loop
+ *     - receiving X11 events
+ *     - dispatching events to HbTK windows
+ *     - controlling when the application exits
+ *
+ *
+ * #include <MainWindow.hpp>
+ *
+ * Includes the HbTK Window class.
+ *
+ * Despite the filename being MainWindow.hpp, the class defined there is:
+ *
+ *     HbTK::Window
+ *
+ * This class represents an HbTK top-level application window.
+ *
+ * It is responsible for the actual X11 window and its GUI contents.
+ *
+ *
+ * int main(int argc, char** argv)
+ *
+ * The normal C++ program entry point.
+ *
+ * argc contains the number of command-line arguments.
+ *
+ * argv contains the command-line arguments themselves.
+ *
+ * HbTK's Application currently accepts these values so the application
+ * framework has access to the program's command-line environment.
+ *
+ *
+ * {
+ *
+ * Begins the body of main().
+ *
+ *
+ * HbTK::Application app(argc, argv);
+ *
+ * Creates the HbTK application object.
+ *
+ * The HbTK:: namespace identifies this as a class belonging to HbTK.
+ *
+ * Creating the application establishes the application's X11 connection.
+ *
+ * The app object will later own and run the main event loop.
+ *
+ * Conceptually:
+ *
+ *     Application
+ *         |
+ *         +-- X11 Display
+ *
+ *
+ * HbTK::Window window(100, 100, 800, 600);
+ *
+ * Creates an HbTK top-level window object.
+ *
+ * The arguments specify:
+ *
+ *     100 = X position
+ *     100 = Y position
+ *     800 = width
+ *     600 = height
+ *
+ * At this point, the C++ Window object exists, but the X11 window has not
+ * yet been created.
+ *
+ * The actual X11 window is created when:
+ *
+ *     app.addWindow(&window);
+ *
+ * is called.
+ *
+ * This separation is intentional:
+ *
+ *     Application -> owns the X11 connection
+ *     Window      -> represents a window using that connection
+ *
+ *
+ * window.setTitle("HbTK Gallery");
+ *
+ * Sets the window's title.
+ *
+ * The title is stored by the HbTK Window object.
+ *
+ * When the X11 window has been created, HbTK uses that title for the
+ * X11 window manager's titlebar.
+ *
+ * The title is therefore visible to Hackedbox when Hackedbox is managing
+ * the window.
+ *
+ *
+ * app.addWindow(&window);
+ *
+ * Registers the window with the HbTK application.
+ *
+ * The application:
+ *
+ *     1. receives the Window pointer
+ *     2. gives the window its X11 Display
+ *     3. creates the actual X11 window
+ *     4. registers the window
+ *     5. maps/shows the window
+ *
+ * After this call, the relationship is:
+ *
+ *     Application
+ *         |
+ *         +-- X11 Display
+ *         |
+ *         +-- Window
+ *               |
+ *               +-- X11 Window
+ *
+ * The window also becomes part of the application's event-dispatch system.
+ *
+ *
+ * return app.exec();
+ *
+ * Starts the HbTK event loop.
+ *
+ * app.exec() waits for X11 events and dispatches them to the appropriate
+ * HbTK window.
+ *
+ * For example:
+ *
+ *     X11
+ *      |
+ *      +-- Expose
+ *      |      |
+ *      |      +-- Window::handleEvent()
+ *      |
+ *      +-- ConfigureNotify
+ *      |      |
+ *      |      +-- Window::handleEvent()
+ *      |
+ *      +-- Mouse event
+ *      |      |
+ *      |      +-- Window::handleEvent()
+ *      |
+ *      +-- WM_DELETE_WINDOW
+ *             |
+ *             +-- Window::handleEvent()
+ *                    |
+ *                    +-- Application::quit()
+ *
+ * The event loop continues running until the application is told to quit.
+ *
+ * When it finishes, exec() returns 0, which becomes the program's exit
+ * status.
+ *
+ *
+ * }
+ *
+ * Ends main().
+ *
+ * The local objects are destroyed in reverse order:
+ *
+ *     Window
+ *         |
+ *         +-- destroyed first
+ *
+ *     Application
+ *         |
+ *         +-- destroyed second
+ *
+ * The Window releases its X11 window and graphics context.
+ *
+ * The Application then closes the shared X11 Display connection.
+ *
+ *
+ * What this tiny program establishes
+ * --------------------------------------------------------------------------
+ *
+ *     main()
+ *       |
+ *       +-- Application
+ *       |      |
+ *       |      +-- owns X11 connection
+ *       |
+ *       +-- Window
+ *       |      |
+ *       |      +-- owns X11 window
+ *       |
+ *       +-- exec()
+ *              |
+ *              +-- owns event loop
+ *
+ * This establishes the basic HbTK application model.
+ *
+ * It provides the foundation for:
+ *
+ *     - Frames
+ *     - Widgets
+ *     - Input handling
+ *     - Styling
+ *     - Menus
+ *     - Dialogs
+ *     - Hackedbox GUI integration
+ *
+ *
+ *
+ * In the terminal 
+ *	cd ~/projects/hbtk/examples/hbtk-gallery
+ *
+ *
+ /*g++ -std=c++17 \
+    -I../../include \
+    src/main.cpp \
+    ../../src/*.cpp \
+    -lX11 \
+    -lXft \
+    -o hbtk-gallery
+ */
+ *
+ *	run the binary
+ *	./hbtk-gallery
+ */

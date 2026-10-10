@@ -1,0 +1,49 @@
+## HbTK
+
+HbTK is the GUI structure of Hackedbox. It provides the drawing, widgets,
+dialogs, and other graphical components used by Hackedbox. HbTK is being
+separated from the main Hackedbox source so the GUI can be developed
+independently while retaining the classic Hackedbox look and behavior.
+
+## Documentation
+
+Project history and development notes:
+
+docs/HISTORY
+docs/CHANGELOG
+
+## Build
+
+Requirements:
+
+C++ compiler
+X11 development libraries
+Make
+
+
+Build:
+
+    ./configure --prefix=/usr
+    make -j$(nproc)
+    sudo make install
+
+Clean:
+
+make clean
+
+See the docs/INSTALL file for the full build instructions.
+
+## Source Layout
+
+HbTK/
+ include/       Public headers
+src/           Source files
+docs/          Documentation and project history
+LICENSE        MIT license
+Makefile       Build system
+README.md      This file
+
+
+## License
+
+MIT License. See LICENSE.

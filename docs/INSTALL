@@ -1,0 +1,120 @@
+## HbTK
+
+Installation and build instructions for HbTK.
+
+## Requirements
+
+HbTK requires:
+
+```
+C++ compiler
+X11 development libraries
+GNU Make
+Autoconf
+Automake
+Libtool
+```
+
+## Building from a Source Archive
+
+If the source archive already contains a generated `configure` script:
+
+```
+./configure --prefix=/usr
+make -j$(nproc)
+sudo make install
+```
+
+## Building from Git
+
+When building directly from the Git source tree, regenerate the
+Autotools build files first:
+
+```
+autoreconf -fi
+```
+
+Then configure and build:
+
+```
+./configure --prefix=/usr
+make -j$(nproc)
+sudo make install
+```
+
+## Configure Options
+
+The installation prefix can be changed with `--prefix`:
+
+```
+./configure --prefix=/usr/local
+```
+
+The default prefix is:
+
+```
+/usr/local
+```
+
+## Cleaning
+
+Remove compiled objects and other build output:
+
+```
+make clean
+```
+
+To completely regenerate the configured build:
+
+```
+make distclean
+```
+
+When rebuilding the Autotools files from Git:
+
+```
+autoreconf -fi
+./configure --prefix=/usr
+```
+
+## Uninstall
+
+If the generated Makefile supports uninstall:
+
+```
+sudo make uninstall
+```
+
+## Installation Files
+
+HbTK installs its toolkit files according to the configured installation
+prefix.
+
+The exact installed files and locations may change while HbTK is being
+developed.
+
+## Documentation
+
+Additional project documentation:
+
+```
+docs/HISTORY
+docs/CHANGELOG
+docs/HbTK-TODO
+```
+
+The project README is located at:
+
+```
+README
+```
+
+## License
+
+HbTK is released under the MIT License.
+
+See:
+
+```
+docs/LICENSE
+```
