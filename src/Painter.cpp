@@ -46,6 +46,22 @@ void Painter::translate(int x, int y)
     m_originY += y;
 }
 
+void Painter::setOrigin(int x, int y)
+{
+    m_originX = x;
+    m_originY = y;
+}
+
+int Painter::originX() const
+{
+    return m_originX;
+}
+
+int Painter::originY() const
+{
+    return m_originY;
+}
+
 void Painter::fillRect(int x, int y,
                        unsigned int width, unsigned int height,
                        const Colors& color)
@@ -94,15 +110,75 @@ void Painter::drawRect(int x, int y,
     fillRect(x, y, width, 1, color);
 
     if (height > 1)
-        fillRect(x, y + static_cast<int>(height) - 1, width, 1, color);
+        fillRect(x, y + static_cast<int>(height) - 1,
+                 width, 1, color);
 
     if (height > 2) {
         fillRect(x, y + 1, 1, height - 2, color);
 
         if (width > 1)
-            fillRect(x + static_cast<int>(width) - 1, y + 1,
-                     1, height - 2, color);
+            fillRect(x + static_cast<int>(width) - 1,
+                     y + 1, 1, height - 2, color);
     }
+}
+
+void Painter::fillCircle(int x, int y,
+                         unsigned int diameter,
+                         const Colors& color)
+{
+    if (!m_display || !m_window || !m_graphicsContext || !diameter)
+        return;
+
+    XSetForeground(m_display, m_graphicsContext, pixel(color));
+    XFillArc(m_display, m_window, m_graphicsContext,
+             x + m_originX, y + m_originY,
+             diameter, diameter, 0, 360 * 64);
+}
+
+void Painter::drawCircle(int x, int y,
+                         unsigned int diameter,
+                         const Colors& color)
+{
+    if (!m_display || !m_window || !m_graphicsContext || !diameter)
+        return;
+
+    XSetForeground(m_display, m_graphicsContext, pixel(color));
+    XDrawArc(m_display, m_window, m_graphicsContext,
+             x + m_originX, y + m_originY,
+             diameter - 1, diameter - 1, 0, 360 * 64);
+}
+
+void Painter::fillHalfCircle(int x, int y,
+                             unsigned int diameter,
+                             bool leftHalf,
+                             const Colors& color)
+{
+    if (!m_display || !m_window || !m_graphicsContext || !diameter)
+        return;
+
+    const int startAngle = leftHalf ? 90 * 64 : 270 * 64;
+
+    XSetForeground(m_display, m_graphicsContext, pixel(color));
+    XFillArc(m_display, m_window, m_graphicsContext,
+             x + m_originX, y + m_originY,
+             diameter, diameter, startAngle, 180 * 64);
+}
+
+void Painter::drawHalfCircle(int x, int y,
+                             unsigned int diameter,
+                             bool leftHalf,
+                             const Colors& color)
+{
+    if (!m_display || !m_window || !m_graphicsContext || !diameter)
+        return;
+
+    const int startAngle = leftHalf ? 90 * 64 : 270 * 64;
+
+    XSetForeground(m_display, m_graphicsContext, pixel(color));
+    XDrawArc(m_display, m_window, m_graphicsContext,
+             x + m_originX, y + m_originY,
+             diameter - 1, diameter - 1,
+             startAngle, 180 * 64);
 }
 
 void Painter::drawText(int x, int y,

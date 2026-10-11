@@ -1,0 +1,10 @@
+
+oct 10 2026
+### HbTK Update
+- **Colors:** Improved color handling and color definitions.
+- **Painter:** Improved drawing and rendering support.
+- **MainWindow:** Updated window and central-widget handling.
+- **FileTree:** Improved file-tree widget functionality.
+- **OpenFileDialog:** Added a reusable open-file dialog widget and example.
+- **Build system:** Updated Autotools configuration and `.gitignore`.
+- **Cleanup:** Removed the tracked FileTree test binary.

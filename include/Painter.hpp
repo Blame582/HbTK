@@ -3,7 +3,6 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
-
 #include <string>
 #include <Colors.hpp>
 
@@ -20,6 +19,9 @@ public:
     ~Painter();
 
     void translate(int x, int y);
+    void setOrigin(int x, int y);
+    int originX() const;
+    int originY() const;
 
     void fillRect(int x, int y,
                   unsigned int width, unsigned int height,
@@ -29,9 +31,20 @@ public:
                   unsigned int width, unsigned int height,
                   const Colors& color);
 
+    void fillCircle(int x, int y, unsigned int diameter,
+                    const Colors& color);
+
+    void drawCircle(int x, int y, unsigned int diameter,
+                    const Colors& color);
+
+    void fillHalfCircle(int x, int y, unsigned int diameter,
+                        bool leftHalf, const Colors& color);
+
+    void drawHalfCircle(int x, int y, unsigned int diameter,
+                        bool leftHalf, const Colors& color);
+
     void drawText(int x, int y,
-                  const char* text,
-                  const Colors& color);
+                  const char* text, const Colors& color);
 
     int textWidth(const char* text) const;
     int fontAscent() const;

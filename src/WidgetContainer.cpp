@@ -1,22 +1,21 @@
-#include <WidgetContainer.hpp>
 
-#include <algorithm>
+#include <WidgetContainer.hpp>
+#include <Painter.hpp>
 
 namespace HbTK {
 
 WidgetContainer::WidgetContainer()
-    : m_focusWidget(nullptr)
-{
+    : m_focusWidget(nullptr),
+      m_backgroundColor(255, 255, 255),
+      m_hasBackgroundColor(false){
 }
 
-WidgetContainer::~WidgetContainer()
-{
+WidgetContainer::~WidgetContainer(){
     for (Widget* widget : m_widgets)
         delete widget;
 }
 
-void WidgetContainer::addWidget(Widget* widget)
-{
+void WidgetContainer::addWidget(Widget* widget){
     if (!widget)
         return;
 
@@ -24,12 +23,19 @@ void WidgetContainer::addWidget(Widget* widget)
     m_widgets.push_back(widget);
 }
 
-Widget* WidgetContainer::widgetAt(int x, int y) const
-{
+void WidgetContainer::setBackgroundColor(const Colors& color){
+    m_backgroundColor = color;
+    m_hasBackgroundColor = true;
+}
+
+void WidgetContainer::clearBackgroundColor(){
+    m_hasBackgroundColor = false;
+}
+
+Widget* WidgetContainer::widgetAt(int x, int y) const{
     for (auto it = m_widgets.rbegin();
          it != m_widgets.rend();
-         ++it)
-    {
+         ++it) {
         Widget* widget = *it;
 
         if (!widget || !widget->visible())
@@ -38,8 +44,7 @@ Widget* WidgetContainer::widgetAt(int x, int y) const
         if (x >= widget->x() &&
             y >= widget->y() &&
             x < widget->x() + widget->width() &&
-            y < widget->y() + widget->height())
-        {
+            y < widget->y() + widget->height()) {
             return widget;
         }
     }
@@ -47,19 +52,28 @@ Widget* WidgetContainer::widgetAt(int x, int y) const
     return nullptr;
 }
 
-void WidgetContainer::paint(Painter& painter)
-{
-    for (Widget* widget : m_widgets)
-    {
-        if (widget && widget->visible())
-            widget->paint(painter);
+void WidgetContainer::paint(Painter& painter){
+    const int oldOriginX = painter.originX();
+    const int oldOriginY = painter.originY();
+
+    if (m_hasBackgroundColor)
+        painter.fillRect(0, 0, width(), height(), m_backgroundColor);
+
+    for (Widget* widget : m_widgets) {
+        if (!widget || !widget->visible())
+            continue;
+
+        painter.setOrigin(
+            oldOriginX + widget->x(),
+            oldOriginY + widget->y());
+
+        widget->paint(painter);
+
+        painter.setOrigin(oldOriginX, oldOriginY);
     }
 }
 
-void WidgetContainer::mousePress(int x,
-                                  int y,
-                                  unsigned int button)
-{
+void WidgetContainer::mousePress(int x, int y, unsigned int button){
     Widget* widget = widgetAt(x, y);
 
     if (!widget)
@@ -70,14 +84,10 @@ void WidgetContainer::mousePress(int x,
     widget->mousePress(
         x - widget->x(),
         y - widget->y(),
-        button
-    );
+        button);
 }
 
-void WidgetContainer::mouseRelease(int x,
-                                   int y,
-                                   unsigned int button)
-{
+void WidgetContainer::mouseRelease(int x, int y, unsigned int button){
     Widget* widget = widgetAt(x, y);
 
     if (!widget)
@@ -86,12 +96,10 @@ void WidgetContainer::mouseRelease(int x,
     widget->mouseRelease(
         x - widget->x(),
         y - widget->y(),
-        button
-    );
+        button);
 }
 
-void WidgetContainer::mouseMove(int x, int y)
-{
+void WidgetContainer::mouseMove(int x, int y){
     Widget* widget = widgetAt(x, y);
 
     if (!widget)
@@ -99,18 +107,15 @@ void WidgetContainer::mouseMove(int x, int y)
 
     widget->mouseMove(
         x - widget->x(),
-        y - widget->y()
-    );
+        y - widget->y());
 }
 
-void WidgetContainer::keyPress(unsigned int keycode)
-{
+void WidgetContainer::keyPress(unsigned int keycode){
     if (m_focusWidget)
         m_focusWidget->keyPress(keycode);
 }
 
-void WidgetContainer::keyRelease(unsigned int keycode)
-{
+void WidgetContainer::keyRelease(unsigned int keycode){
     if (m_focusWidget)
         m_focusWidget->keyRelease(keycode);
 }

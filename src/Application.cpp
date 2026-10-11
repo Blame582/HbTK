@@ -1,54 +1,56 @@
 // Application.cpp for HbTK
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 
-#include "Application.hpp"
-
+#include <Application.hpp>
 #include <MainWindow.hpp>
+
+#include <algorithm>
+#include <sys/select.h>
+#include <unistd.h>
 
 namespace HbTK {
 
-Application::Application(int& argc,
-                         char** argv)
+Application::Application(int& argc, char** argv)
     : m_display(nullptr),
-      m_running(false)
-{
+      m_running(false) {
     (void)argc;
     (void)argv;
-
     m_display = XOpenDisplay(nullptr);
 }
 
-Application::~Application()
-{
+Application::~Application() {
     if (m_display)
         XCloseDisplay(m_display);
 }
 
-int Application::exec()
-{
+int Application::exec() {
     if (!m_display)
         return 1;
 
     m_running = true;
+    const int xfd = ConnectionNumber(m_display);
 
-    while (m_running)
-    {
-        XEvent event;
+    while (m_running) {
+        fd_set readfds;
+        FD_ZERO(&readfds);
+        FD_SET(xfd, &readfds);
 
-        XNextEvent(
-            m_display,
-            &event
-        );
+        struct timeval timeout {};
+        timeout.tv_usec = 20000;
 
-        for (Window* window : m_windows)
-        {
-            if (!window)
-                continue;
+        const int result = select(xfd + 1, &readfds, nullptr, nullptr, &timeout);
 
-            if (window->handleEvent(event))
-            {
-                quit();
-                break;
+        if (result > 0 && FD_ISSET(xfd, &readfds)) {
+            while (XPending(m_display) > 0) {
+                XEvent event;
+                XNextEvent(m_display, &event);
+
+                for (Window* window : m_windows) {
+                    if (window && window->handleEvent(event)) {
+                        quit();
+                        break;
+                    }
+                }
             }
         }
     }
@@ -56,13 +58,11 @@ int Application::exec()
     return 0;
 }
 
-void Application::quit()
-{
+void Application::quit() {
     m_running = false;
 }
 
-void Application::addWindow(Window* window)
-{
+void Application::addWindow(Window* window) {
     if (!window || !m_display)
         return;
 
@@ -70,13 +70,11 @@ void Application::addWindow(Window* window)
         return;
 
     m_windows.push_back(window);
-
     window->show();
 }
 
-Display* Application::display() const
-{
+Display* Application::display() const {
     return m_display;
 }
 
-} // namespace HbTK
+}
