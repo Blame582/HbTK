@@ -6,3 +6,43 @@
 *.la
 .libs/
 .deps/
+
+# Generated configuration and build output
+/autom4te.cache/
+/config.h
+/config.log
+/config.status
+/Makefile
+/stamp-h1
+/hbtk.pc
+
+# Editor and backup files
+*~
+*.bak
+*.bk
+
+# Example binaries
+/examples/button/button-test
+/examples/filetree/filetree_test
+/examples/hbtk-gallery/hbtk-gallery
+/examples/label/label_test
+
+# Autotools build artifacts
+/autom4te.cache/
+/config.h
+/config.log
+/config.status
+/Makefile
+/stamp-h1
+/hbtk.pc
+/aclocal.m4
+/config.h.in
+/configure
+/depcomp
+/install-sh
+/missing
+
+# Backups
+*~
+*.bak
+*.bk

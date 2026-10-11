@@ -448,7 +448,34 @@ bool Window::handleEvent(const XEvent& event)
                 }
             }
         }
+        
+        if (m_centralWidget && m_centralWidget->visible()) {
+            if (px >= m_centralWidget->x() &&
+                px < m_centralWidget->x() + m_centralWidget->width() &&
+                py >= m_centralWidget->y() &&
+                py < m_centralWidget->y() + m_centralWidget->height()) {
+                m_centralWidget->mousePress(
+                    px - m_centralWidget->x(),
+                    py - m_centralWidget->y(),
+                    event.xbutton.button
+                );
+                paint();
+            }
+        }
 
+        break;
+    }
+    
+    case ButtonRelease: {
+        if (m_centralWidget &&
+            m_centralWidget->visible()) {
+            m_centralWidget->mouseRelease(
+                event.xbutton.x - m_centralWidget->x(),
+                event.xbutton.y - m_centralWidget->y(),
+                event.xbutton.button
+            );
+            paint();
+        }
         break;
     }
 
@@ -510,6 +537,15 @@ bool Window::handleEvent(const XEvent& event)
                     break;
                 }
             }
+        }
+        
+        if (m_centralWidget &&
+            m_centralWidget->visible()) {
+            m_centralWidget->mouseMove(
+                px - m_centralWidget->x(),
+                py - m_centralWidget->y()
+            );
+            paint();
         }
 
         break;
@@ -620,17 +656,14 @@ void Window::paint()
         !m_backBuffer)
         return;
 
-    /*
-     * Render the complete window into the off-screen
-     * buffer. Nothing is drawn directly to the screen
-     * until the complete frame is ready.
-     */
     Painter painter(
         m_display,
         m_backBuffer,
         m_graphicsContext
         );
-
+        
+         painter.setFont("monospace-10");
+        
     if (m_style)
     {
         painter.fillRect(
@@ -692,10 +725,11 @@ void Window::paint()
             );
     }
 
-    if (m_centralWidget &&
-        m_centralWidget->visible())
+    if (m_centralWidget && m_centralWidget->visible())
     {
+        painter.translate(m_centralWidget->x(), m_centralWidget->y());
         m_centralWidget->paint(painter);
+        painter.translate(-m_centralWidget->x(), -m_centralWidget->y());
     }
 
     if (m_menuBar &&

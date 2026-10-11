@@ -1,18 +1,38 @@
+
 #include <Painter.hpp>
+
+#include <X11/extensions/Xrender.h>
+#include <X11/Xutil.h>
+
+#include <cstring>
 
 namespace HbTK {
 
 Painter::Painter(Display* display,
                  ::Window window,
-                 GC graphicsContext)
+                 GC graphicsContext,
+                 Visual* visual,
+                 Colormap colormap)
     : m_display(display),
       m_window(window),
       m_graphicsContext(graphicsContext),
+      m_visual(visual),
+      m_colormap(colormap),
       m_originX(0),
       m_originY(0),
       m_font(nullptr),
       m_fontName()
 {
+    if (!m_display)
+        return;
+
+    const int screen = DefaultScreen(m_display);
+
+    if (!m_visual)
+        m_visual = DefaultVisual(m_display, screen);
+
+    if (!m_colormap)
+        m_colormap = DefaultColormap(m_display, screen);
 }
 
 Painter::~Painter()
@@ -26,108 +46,89 @@ void Painter::translate(int x, int y)
     m_originY += y;
 }
 
-void Painter::fillRect(int x,
-                       int y,
-                       unsigned int width,
-                       unsigned int height,
+void Painter::fillRect(int x, int y,
+                       unsigned int width, unsigned int height,
                        const Colors& color)
 {
-    XSetForeground(
-        m_display,
-        m_graphicsContext,
-        pixel(color)
-        );
+    if (!m_display || !m_window || !width || !height)
+        return;
 
-    XFillRectangle(
+    XRenderPictFormat* format = XRenderFindVisualFormat(
+        m_display, m_visual);
+
+    if (!format)
+        return;
+
+    Picture destination = XRenderCreatePicture(
+        m_display, m_window, format, 0, nullptr);
+
+    if (!destination)
+        return;
+
+    XRenderColor renderColor;
+    renderColor.red = static_cast<unsigned short>(color.red() * 257);
+    renderColor.green = static_cast<unsigned short>(color.green() * 257);
+    renderColor.blue = static_cast<unsigned short>(color.blue() * 257);
+    renderColor.alpha = static_cast<unsigned short>(color.alpha() * 257);
+
+    XRenderFillRectangle(
         m_display,
-        m_window,
-        m_graphicsContext,
+        PictOpOver,
+        destination,
+        &renderColor,
         x + m_originX,
         y + m_originY,
         width,
-        height
-        );
+        height);
+
+    XRenderFreePicture(m_display, destination);
 }
 
-void Painter::drawRect(int x,
-                       int y,
-                       unsigned int width,
-                       unsigned int height,
+void Painter::drawRect(int x, int y,
+                       unsigned int width, unsigned int height,
                        const Colors& color)
 {
-    XSetForeground(
-        m_display,
-        m_graphicsContext,
-        pixel(color)
-        );
+    if (!width || !height)
+        return;
 
-    XDrawRectangle(
-        m_display,
-        m_window,
-        m_graphicsContext,
-        x + m_originX,
-        y + m_originY,
-        width,
-        height
-        );
+    fillRect(x, y, width, 1, color);
+
+    if (height > 1)
+        fillRect(x, y + static_cast<int>(height) - 1, width, 1, color);
+
+    if (height > 2) {
+        fillRect(x, y + 1, 1, height - 2, color);
+
+        if (width > 1)
+            fillRect(x + static_cast<int>(width) - 1, y + 1,
+                     1, height - 2, color);
+    }
 }
 
-void Painter::drawText(int x,
-                       int y,
+void Painter::drawText(int x, int y,
                        const char* text,
                        const Colors& color)
 {
-    if (!text)
+    if (!m_display || !m_window || !text || !m_font)
         return;
 
-    if (!m_font)
-        return;
-
-    XftDraw* draw =
-        XftDrawCreate(
-            m_display,
-            m_window,
-            DefaultVisual(
-                m_display,
-                DefaultScreen(m_display)
-                ),
-            DefaultColormap(
-                m_display,
-                DefaultScreen(m_display)
-                )
-            );
+    XftDraw* draw = XftDrawCreate(
+        m_display, m_window, m_visual, m_colormap);
 
     if (!draw)
         return;
 
     XRenderColor renderColor;
-
-    renderColor.red =
-        static_cast<unsigned short>(color.red() * 257);
-
-    renderColor.green =
-        static_cast<unsigned short>(color.green() * 257);
-
-    renderColor.blue =
-        static_cast<unsigned short>(color.blue() * 257);
-
-    renderColor.alpha = 65535;
+    renderColor.red = static_cast<unsigned short>(color.red() * 257);
+    renderColor.green = static_cast<unsigned short>(color.green() * 257);
+    renderColor.blue = static_cast<unsigned short>(color.blue() * 257);
+    renderColor.alpha = static_cast<unsigned short>(color.alpha() * 257);
 
     XftColor xftColor;
 
     if (XftColorAllocValue(
-            m_display,
-            DefaultVisual(
-                m_display,
-                DefaultScreen(m_display)
-                ),
-            DefaultColormap(
-                m_display,
-                DefaultScreen(m_display)
-                ),
-            &renderColor,
-            &xftColor))
-    {
+            m_display, m_visual, m_colormap,
+            &renderColor, &xftColor)) {
         XftDrawStringUtf8(
             draw,
             &xftColor,
@@ -135,23 +136,10 @@ void Painter::drawText(int x,
             x + m_originX,
             y + m_originY,
             reinterpret_cast<const FcChar8*>(text),
-            static_cast<int>(
-                __builtin_strlen(text)
-                )
-            );
+            static_cast<int>(std::strlen(text)));
 
         XftColorFree(
-            m_display,
-            DefaultVisual(
-                m_display,
-                DefaultScreen(m_display)
-                ),
-            DefaultColormap(
-                m_display,
-                DefaultScreen(m_display)
-                ),
-            &xftColor
-            );
+            m_display, m_visual, m_colormap, &xftColor);
     }
 
     XftDrawDestroy(draw);
@@ -159,7 +147,7 @@ void Painter::drawText(int x,
 
 int Painter::textWidth(const char* text) const
 {
-    if (!text || !m_font)
+    if (!text || !m_font || !m_display)
         return 0;
 
     XGlyphInfo extents;
@@ -168,27 +156,20 @@ int Painter::textWidth(const char* text) const
         m_display,
         m_font,
         reinterpret_cast<const FcChar8*>(text),
-        static_cast<int>(__builtin_strlen(text)),
-        &extents
-        );
+        static_cast<int>(std::strlen(text)),
+        &extents);
 
     return static_cast<int>(extents.xOff);
 }
 
 int Painter::fontAscent() const
 {
-    if (!m_font)
-        return 0;
-
-    return m_font->ascent;
+    return m_font ? m_font->ascent : 0;
 }
 
 int Painter::fontDescent() const
 {
-    if (!m_font)
-        return 0;
-
-    return m_font->descent;
+    return m_font ? m_font->descent : 0;
 }
 
 bool Painter::setFont(const std::string& font)
@@ -196,18 +177,13 @@ bool Painter::setFont(const std::string& font)
     if (!m_display)
         return false;
 
-    XftFont* newFont =
-        XftFontOpenName(
-            m_display,
-            DefaultScreen(m_display),
-            font.c_str()
-            );
+    XftFont* newFont = XftFontOpenName(
+        m_display, DefaultScreen(m_display), font.c_str());
 
     if (!newFont)
         return false;
 
     resetFont();
-
     m_font = newFont;
     m_fontName = font;
 
@@ -216,13 +192,8 @@ bool Painter::setFont(const std::string& font)
 
 void Painter::resetFont()
 {
-    if (!m_font || !m_display)
-        return;
-
-    XftFontClose(
-        m_display,
-        m_font
-        );
+    if (m_font && m_display)
+        XftFontClose(m_display, m_font);
 
     m_font = nullptr;
     m_fontName.clear();
@@ -235,11 +206,9 @@ const std::string& Painter::font() const
 
 unsigned long Painter::pixel(const Colors& color)
 {
-    return (
-        (static_cast<unsigned long>(color.red()) << 16) |
-        (static_cast<unsigned long>(color.green()) << 8) |
-        static_cast<unsigned long>(color.blue())
-        );
+    return (static_cast<unsigned long>(color.red()) << 16) |
+           (static_cast<unsigned long>(color.green()) << 8) |
+           static_cast<unsigned long>(color.blue());
 }
 
 } // namespace HbTK

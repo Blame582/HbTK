@@ -1,61 +1,57 @@
-# Makefile.am for HbTK
-# Hackedbox Toolkit
+AM_CPPFLAGS = -I$(srcdir)/include $(HBTK_CFLAGS)
+AM_CXXFLAGS = -Wall -Wextra -fPIC
 
-CXX       = g++
-AR        = ar
-ARFLAGS   = rcs
+lib_LIBRARIES = libhbtk.a
+libhbtk_a_SOURCES = \
+    src/Application.cpp \
+    src/Button.cpp \
+    src/Colors.cpp \
+    src/Dialog.cpp \
+    src/Entry.cpp \
+    src/Event.cpp \
+    src/EventDispatcher.cpp \
+    src/FileTree.cpp \
+    src/Frame.cpp \
+    src/Label.cpp \
+    src/MainWindow.cpp \
+    src/Menu.cpp \
+    src/MenuBar.cpp \
+    src/Module.cpp \
+    src/OpenFileDialog.cpp \
+    src/Painter.cpp \
+    src/Splitter.cpp \
+    src/Style.cpp \
+    src/StyleEngine.cpp \
+    src/TerminalWidget.cpp \
+    src/Widget.cpp \
+    src/WidgetContainer.cpp
 
-PREFIX    ?= /usr
-INCLUDEDIR = $(PREFIX)/include/hbtk
-LIBDIR     = $(PREFIX)/lib
+hbtkincludedir = $(includedir)/hbtk
+hbtkinclude_HEADERS = \
+    include/Application.hpp \
+    include/Button.hpp \
+    include/Colors.hpp \
+    include/Dialog.hpp \
+    include/Entry.hpp \
+    include/Event.hpp \
+    include/EventDispatcher.hpp \
+    include/FileTree.hpp \
+    include/Frame.hpp \
+    include/Label.hpp \
+    include/MainWindow.hpp \
+    include/Menu.hpp \
+    include/MenuBar.hpp \
+    include/Module.hpp \
+    include/OpenFileDialog.hpp \
+    include/Painter.hpp \
+    include/Splitter.hpp \
+    include/Style.hpp \
+    include/StyleEngine.hpp \
+    include/TerminalWidget.hpp \
+    include/Widget.hpp \
+    include/WidgetContainer.hpp
 
-CPPFLAGS  = -Iinclude -I/usr/include/freetype2
-CXXFLAGS  = -O2 -Wall -Wextra -fPIC
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = hbtk.pc
 
-TARGET    = libhbtk.a
-
-SOURCES = \
-	src/Application.cpp \
-	src/Button.cpp \
-	src/Colors.cpp \
-	src/Dialog.cpp \
-	src/Entry.cpp \
-	src/Event.cpp \
-	src/EventDispatcher.cpp \
-	src/Frame.cpp \
-	src/FileTree.cpp \
-	src/Label.cpp \
-	src/MainWindow.cpp \
-	src/Module.cpp \
-	src/Painter.cpp \
-	src/Splitter.cpp \
-	src/Style.cpp \
-	src/StyleEngine.cpp \
-	src/TerminalWidget.cpp \
-	src/Widget.cpp \
-	src/WidgetContainer.cpp
-
-OBJECTS = $(SOURCES:.cpp=.o)
-
-.PHONY: all clean install uninstall
-
-all: $(TARGET)
-
-$(TARGET): $(OBJECTS)
-	$(AR) $(ARFLAGS) $@ $^
-
-%.o: %.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-install: $(TARGET)
-	install -d $(DESTDIR)$(INCLUDEDIR)
-	install -d $(DESTDIR)$(LIBDIR)
-	install -m 644 include/*.hpp $(DESTDIR)$(INCLUDEDIR)/
-	install -m 644 $(TARGET) $(DESTDIR)$(LIBDIR)/
-
-uninstall:
-	rm -rf $(DESTDIR)$(INCLUDEDIR)
-	rm -f $(DESTDIR)$(LIBDIR)/$(TARGET)
-
-clean:
-	rm -f $(OBJECTS) $(TARGET)
+EXTRA_DIST = README docs/INSTALL

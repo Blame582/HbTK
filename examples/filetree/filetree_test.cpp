@@ -1,8 +1,8 @@
+
 #include <X11/Xlib.h>
 
 #include <FileTree.hpp>
 #include <MainWindow.hpp>
-#include <MenuBar.hpp>
 #include <Painter.hpp>
 #include <Widget.hpp>
 
@@ -25,29 +25,35 @@ public:
 
     void paint(HbTK::Painter& painter) override
     {
-        painter.fillRect(0, 0, width(), 30, HbTK::Colors("#303030"));
-        painter.drawRect(0, 0, width(), 30, HbTK::Colors("#505050"));
+        painter.fillRect(0, 0, width(), 36,
+                         HbTK::Colors("#242831ee"));
+        painter.fillRect(0, 35, width(), 1,
+                         HbTK::Colors("#414957"));
 
-        painter.drawText(10, 20, "Open Folder", HbTK::Colors("#ffffff"));
-        painter.drawText(120, 20, "Save Project", HbTK::Colors("#ffffff"));
-        painter.drawText(245, 20, m_treeVisible ? "Hide Tree" : "Show Tree",
-                         HbTK::Colors("#ffffff"));
+        painter.setFont("Hack:size=11");
+        painter.drawText(12, 23, "FILES",
+                         HbTK::Colors("#c7d0df"));
 
-        if (m_treeVisible)
+        const char* toggleText =
+            m_treeVisible ? "Hide tree" : "Show tree";
+
+        painter.drawText(width() - 100, 23, toggleText,
+                         HbTK::Colors("#9caec8"));
+
+        if (m_treeVisible) {
+            painter.translate(0, 36);
             m_tree->paint(painter);
+            painter.translate(0, -36);
+        }
     }
 
     void mousePress(int x, int y, unsigned int button) override
     {
-        if (button != 1)
+        if (button != Button1)
             return;
 
-        if (y < 30) {
-            if (x < 110) {
-                std::cout << "Open Folder: folder dialog not implemented yet\n";
-            } else if (x < 235) {
-                std::cout << "Save Project: project saving not implemented yet\n";
-            } else {
+        if (y < 36) {
+            if (x >= width() - 112) {
                 m_treeVisible = !m_treeVisible;
                 layoutTree();
             }
@@ -55,19 +61,19 @@ public:
         }
 
         if (m_treeVisible)
-            m_tree->mousePress(x, y - 30, button);
+            m_tree->mousePress(x, y - 36, button);
     }
 
     void mouseRelease(int x, int y, unsigned int button) override
     {
-        if (m_treeVisible && y >= 30)
-            m_tree->mouseRelease(x, y - 30, button);
+        if (m_treeVisible && y >= 36)
+            m_tree->mouseRelease(x, y - 36, button);
     }
 
     void mouseMove(int x, int y) override
     {
-        if (m_treeVisible && y >= 30)
-            m_tree->mouseMove(x, y - 30);
+        if (m_treeVisible && y >= 36)
+            m_tree->mouseMove(x, y - 36);
     }
 
     void keyPress(unsigned int key) override
@@ -79,7 +85,9 @@ public:
 private:
     void layoutTree()
     {
-        m_tree->setGeometry(0, 30, width(), m_treeVisible ? height() - 30 : 0);
+        m_tree->setGeometry(
+            0, 36, width(),
+            m_treeVisible ? height() - 36 : 0);
     }
 
     HbTK::FileTree* m_tree;
@@ -90,22 +98,19 @@ int main(int argc, char** argv)
 {
     Display* display = XOpenDisplay(nullptr);
 
-    if (!display)
-        return 1;
-
-    HbTK::Window window(150, 100, 400, 600);
-    window.setTitle("HbTK File Tree");
-
-    if (!window.create(display)) {
-        XCloseDisplay(display);
+    if (!display) {
+        std::cerr << "Cannot open X display\n";
         return 1;
     }
 
-    HbTK::MenuBar menuBar;
-    HbTK::Menu* fileMenu = menuBar.addMenu("File");
-    fileMenu->addItem("Open folder");
-    fileMenu->addItem("Open file");
-    window.setMenuBar(&menuBar);
+    HbTK::Window window(150, 100, 200, 400);
+    window.setTitle("HbTK FileTree");
+
+    if (!window.create(display)) {
+        std::cerr << "Cannot create HbTK window\n";
+        XCloseDisplay(display);
+        return 1;
+    }
 
     HbTK::FileTree tree;
     const std::string root = argc > 1 ? argv[1] : ".";
@@ -119,14 +124,12 @@ int main(int argc, char** argv)
     tree.setFileActivatedCallback(
         [](const std::string& path) {
             std::cout << "File: " << path << '\n';
-        }
-    );
+        });
 
     tree.setDirectoryActivatedCallback(
         [](const std::string& path) {
             std::cout << "Directory: " << path << '\n';
-        }
-    );
+        });
 
     FileTreeView view(&tree);
     window.setCentralWidget(&view);
