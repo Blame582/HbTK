@@ -152,7 +152,8 @@ am_libhbtk_a_OBJECTS = src/Application.$(OBJEXT) src/Button.$(OBJEXT) \
 	src/OpenFileDialog.$(OBJEXT) src/Painter.$(OBJEXT) \
 	src/Splitter.$(OBJEXT) src/Style.$(OBJEXT) \
 	src/StyleEngine.$(OBJEXT) src/TerminalWidget.$(OBJEXT) \
-	src/Widget.$(OBJEXT) src/WidgetContainer.$(OBJEXT)
+	src/TextEdit.$(OBJEXT) src/Widget.$(OBJEXT) \
+	src/WidgetContainer.$(OBJEXT)
 libhbtk_a_OBJECTS = $(am_libhbtk_a_OBJECTS)
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
@@ -179,8 +180,8 @@ am__depfiles_remade = src/$(DEPDIR)/Application.Po \
 	src/$(DEPDIR)/Module.Po src/$(DEPDIR)/OpenFileDialog.Po \
 	src/$(DEPDIR)/Painter.Po src/$(DEPDIR)/Splitter.Po \
 	src/$(DEPDIR)/Style.Po src/$(DEPDIR)/StyleEngine.Po \
-	src/$(DEPDIR)/TerminalWidget.Po src/$(DEPDIR)/Widget.Po \
-	src/$(DEPDIR)/WidgetContainer.Po
+	src/$(DEPDIR)/TerminalWidget.Po src/$(DEPDIR)/TextEdit.Po \
+	src/$(DEPDIR)/Widget.Po src/$(DEPDIR)/WidgetContainer.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -375,6 +376,7 @@ libhbtk_a_SOURCES = \
     src/Style.cpp \
     src/StyleEngine.cpp \
     src/TerminalWidget.cpp \
+    src/TextEdit.cpp \
     src/Widget.cpp \
     src/WidgetContainer.cpp
 
@@ -400,6 +402,7 @@ hbtkinclude_HEADERS = \
     include/Style.hpp \
     include/StyleEngine.hpp \
     include/TerminalWidget.hpp \
+    include/TextEdit.hpp \
     include/Widget.hpp \
     include/WidgetContainer.hpp
 
@@ -532,6 +535,8 @@ src/StyleEngine.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/TerminalWidget.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/TextEdit.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 src/Widget.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/WidgetContainer.$(OBJEXT): src/$(am__dirstamp) \
@@ -569,6 +574,7 @@ include src/$(DEPDIR)/Splitter.Po # am--include-marker
 include src/$(DEPDIR)/Style.Po # am--include-marker
 include src/$(DEPDIR)/StyleEngine.Po # am--include-marker
 include src/$(DEPDIR)/TerminalWidget.Po # am--include-marker
+include src/$(DEPDIR)/TextEdit.Po # am--include-marker
 include src/$(DEPDIR)/Widget.Po # am--include-marker
 include src/$(DEPDIR)/WidgetContainer.Po # am--include-marker
 
@@ -983,6 +989,7 @@ distclean: distclean-am
 	-rm -f src/$(DEPDIR)/Style.Po
 	-rm -f src/$(DEPDIR)/StyleEngine.Po
 	-rm -f src/$(DEPDIR)/TerminalWidget.Po
+	-rm -f src/$(DEPDIR)/TextEdit.Po
 	-rm -f src/$(DEPDIR)/Widget.Po
 	-rm -f src/$(DEPDIR)/WidgetContainer.Po
 	-rm -f Makefile
@@ -1052,6 +1059,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f src/$(DEPDIR)/Style.Po
 	-rm -f src/$(DEPDIR)/StyleEngine.Po
 	-rm -f src/$(DEPDIR)/TerminalWidget.Po
+	-rm -f src/$(DEPDIR)/TextEdit.Po
 	-rm -f src/$(DEPDIR)/Widget.Po
 	-rm -f src/$(DEPDIR)/WidgetContainer.Po
 	-rm -f Makefile

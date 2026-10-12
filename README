@@ -5,8 +5,6 @@ dialogs, and other graphical components used by Hackedbox. HbTK is being
 separated from the main Hackedbox source so the GUI can be developed
 independently while retaining the classic Hackedbox look and behavior.
 
-## Build
-
 Requirements:
 
 C++ compiler

@@ -202,6 +202,29 @@ bool Window::handleEvent(const XEvent& event) {
             }
             break;
 
+        case ButtonPress:
+            if (m_centralWidget)
+                m_centralWidget->mousePress(
+                    event.xbutton.x, event.xbutton.y, event.xbutton.button);
+            paint();
+            break;
+
+        case MotionNotify:
+            if (m_centralWidget && (event.xmotion.state & Button1Mask)) {
+                m_centralWidget->mouseMove(
+                    event.xmotion.x, event.xmotion.y);
+                paint();
+            }
+            break;
+
+        case ButtonRelease:
+            if (m_centralWidget)
+                m_centralWidget->mouseRelease(
+                    event.xbutton.x, event.xbutton.y, event.xbutton.button);
+            paint();
+            break;
+
+
         default:
             break;
     }

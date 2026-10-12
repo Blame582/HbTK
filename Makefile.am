@@ -23,6 +23,7 @@ libhbtk_a_SOURCES = \
     src/Style.cpp \
     src/StyleEngine.cpp \
     src/TerminalWidget.cpp \
+    src/TextEdit.cpp \
     src/Widget.cpp \
     src/WidgetContainer.cpp
 
@@ -48,6 +49,7 @@ hbtkinclude_HEADERS = \
     include/Style.hpp \
     include/StyleEngine.hpp \
     include/TerminalWidget.hpp \
+    include/TextEdit.hpp \
     include/Widget.hpp \
     include/WidgetContainer.hpp
 
