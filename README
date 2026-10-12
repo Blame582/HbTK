@@ -5,13 +5,6 @@ dialogs, and other graphical components used by Hackedbox. HbTK is being
 separated from the main Hackedbox source so the GUI can be developed
 independently while retaining the classic Hackedbox look and behavior.
 
-## Documentation
-
-Project history and development notes:
-
-docs/HISTORY
-docs/CHANGELOG
-
 ## Build
 
 Requirements:
@@ -38,7 +31,7 @@ See the docs/INSTALL file for the full build instructions.
 HbTK/
  include/       Public headers
 src/           Source files
-docs/          Documentation and project history
+docs/          Documentation
 LICENSE        MIT license
 Makefile       Build system
 README.md      This file
