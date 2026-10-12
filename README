@@ -29,7 +29,7 @@ See the docs/INSTALL file for the full build instructions.
 ## Source Layout
 
 HbTK/
- include/       Public headers
+include/       Public headers
 src/           Source files
 docs/          Documentation
 LICENSE        MIT license
