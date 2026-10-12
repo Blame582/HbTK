@@ -1,26 +1,35 @@
+
 #pragma once
 
 #include <cstddef>
 #include <string>
-
 #include <Widget.hpp>
 
 namespace HbTK {
 
-class Entry : public Widget
-{
-public:
-    Entry(int x,
-          int y,
-          int width,
-          int height);
+enum class EntryStyle {
+    Modern,
+    Retro,
+    Glass
+};
 
+enum class EntryAlignment {
+    Left,
+    Center,
+    Right
+};
+
+class Entry : public Widget {
+public:
+    Entry(int x, int y, int width, int height);
     ~Entry() override;
 
     void setText(const std::string& text);
     const std::string& text() const;
-
     void clear();
+
+    void setLabel(const std::string& label);
+    const std::string& label() const;
 
     void setPlaceholder(const std::string& text);
     const std::string& placeholder() const;
@@ -34,22 +43,27 @@ public:
     void setFocus(bool focus);
     bool hasFocus() const;
 
+    void setStyle(EntryStyle style);
+    EntryStyle entryStyle() const;
+
+    void setAlignment(EntryAlignment alignment);
+    EntryAlignment alignment() const;
+
+    int sizeHintHeight(Painter& painter, int padding = 4) const;
+
     void paint(Painter& painter) override;
-
-    void mousePress(int x,
-                    int y,
-                    unsigned int button) override;
-
+    void mousePress(int x, int y, unsigned int button) override;
     void keyPress(unsigned int keycode) override;
 
 private:
     std::string m_text;
+    std::string m_label;
     std::string m_placeholder;
-
     std::size_t m_cursorPosition;
-
     bool m_readOnly;
     bool m_focus;
+    EntryStyle m_style;
+    EntryAlignment m_alignment;
 };
 
 } // namespace HbTK
